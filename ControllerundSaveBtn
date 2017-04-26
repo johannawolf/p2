@@ -1,0 +1,102 @@
+package Aufgabe1;
+
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.Scanner;
+
+public class Controller {
+	
+	public View view;
+	
+	public Controller (View view) {
+		this.view=view;
+		
+		view.getSaveBtn().addActionListener(listener -> saveData());
+		view.getMagicBtn().addActionListener(listener -> showMagicDialog());
+		view.getStrengthBtn().addActionListener(listener-> showStrengthDialog());
+
+		
+		readData();
+		
+		
+		
+	}
+	
+	public void showMagicDialog() {
+
+		MagicView magicView = new MagicView(view, false, view.getMagicValue());
+		new DialogController(magicView);
+
+	
+		magicView.addWindowListener(new WindowAdapter() {
+			
+			public void windowClosed(WindowEvent e) {
+				view.setMagicValue(magicView.getValue());
+				
+			};
+		});
+	}
+	
+	public void showStrengthDialog() {
+
+		StrengthView strengthView = new StrengthView(view, false, view.getStrengthValue());
+		new DialogController(strengthView);
+
+	
+		strengthView.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e) {
+				super.windowClosed(e);
+				view.setStrengthValue(strengthView.getValue());
+			}
+			
+		});
+	}
+
+	private void saveData () {
+		File file = new File ("save.txt");
+		
+		try (
+			FileWriter out = new FileWriter(file);
+			){
+
+			out.write(String.valueOf(view.getMagicValue()));
+			out.write(" ");
+			out.write(String.valueOf(view.getStrengthValue()));
+			view.dispose();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void readData () {
+		File file = new File ("save.txt");
+
+		try (
+			FileReader in = new FileReader(file);
+			Scanner scan = new Scanner(in);
+			){
+			
+			view.setMagicValue(Integer.valueOf(scan.next()));
+			view.setStrengthValue(Integer.valueOf(scan.next()));
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
+	public static void main(String[] args) {
+		
+		View view = new View();
+		new Controller(view);
+
+	}
+
+}
+
